@@ -15,5 +15,3 @@ Faire les expérimentations
 ## Phase3:
 Faire modularité des codes et la structuration avec le cookieCutter Data-Science
 
-sudo /home/onyxia/work/ProjetNlpavril2024/Project1_odione/Project1_odione/bin/python -m ipykernel --user --name=Project1_odione
-ProjetNlpavril2024/Project1_odione
