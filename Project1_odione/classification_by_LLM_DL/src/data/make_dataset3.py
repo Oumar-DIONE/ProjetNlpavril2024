@@ -34,24 +34,23 @@ output_s3_filepath1 = config['output_s3_filepath1']
 input_s3_filepath2 = config['input_s3_filepath2']
 output_s3_filepath2 = config['output_s3_filepath2']
 
-
 s3 = boto3.client("s3",endpoint_url=endpoint_url ,aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, 
                   aws_session_token = aws_session_token)
 
 # Télécharger un fichier depuis un bucket
 # Define local paths for downloading 
-local_Raw_data1 = project_root + '/data/firts_name.csv'
-local_Raw_data2 = project_root+'/data/transcriptions.csv'
-
-" le jeu de données firstname_with_sex"
-s3.download_file(bucket_name, input_s3_filepath1, local_Raw_data1)
-" le jeu de données transcriptions_with_sex"
-s3.download_file(bucket_name, input_s3_filepath2, local_Raw_data2)
-
 
 def get_data():
+    local_Raw_data1 = project_root + '/data/first_name.csv'
+    local_Raw_data2 = project_root+'/data/transcriptions.csv'
+    " le jeu de données firstname_with_sex"
+    s3.download_file(bucket_name, input_s3_filepath1, local_Raw_data1)
+    "le jeu de données transcriptions_with_sex"
+    s3.download_file(bucket_name, input_s3_filepath2, local_Raw_data2)
+
     data1=pd.read_csv(local_Raw_data1,sep=';')
-    data2=pd.read_csv(local_Raw_data2,sep=';')
+    data2=pd.read_csv(local_Raw_data2,sep=',')
+
     print(" Pour le dataset : Firstname", "\n")
     print("shape",data1.shape,"\n")
     print(" Pour le dataset : Transcriptions", "\n")
@@ -61,4 +60,3 @@ def get_data():
     return data1,data2
 
 
-get_data()
