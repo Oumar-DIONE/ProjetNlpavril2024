@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
 import os
 import sys
+from torchsummary import summary  # Importer la fonction summary de torchsummary
+
 
 " set filesystem variables"
 src_dir = os.path.abspath('../src')
@@ -102,4 +104,6 @@ def training(l1,l2,l3,lr=0.001,num_epochs=100):
             performance1=pd.DataFrame(["model1","Train",prev_accuracy])
 
             
-        return performance1
+        return model,performance1 
+
+
