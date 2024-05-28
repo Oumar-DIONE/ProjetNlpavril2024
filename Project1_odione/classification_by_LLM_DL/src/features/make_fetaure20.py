@@ -14,6 +14,10 @@ import re
 import difflib
 import boto3
 from botocore.client import Config
+from sklearn.model_selection import train_test_split
+import yaml
+
+
 
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -137,10 +141,10 @@ def get_overall_feats(df):
     for line_ in df.prediction:
         feats=feats +get_features(line_)
     return set(feats)
-def Binarizer(df,col_to_bin="Sex_num"):
+def Binarizer(df,col_to_bin="sex"):
     # Rendre Binaire la variable sex : homme=1
-    df[col_to_bin]=1
-    df[col_to_bin][df[col_to_bin]=="femme"]=0
+    df["Sex_num"]=1
+    df["Sex_num"][df[col_to_bin]=="femme"]=0
     df=df.drop([col_to_bin],axis=1)
     return df
 
@@ -151,6 +155,7 @@ def bert_preprocessing(df_w):
 # Initialisation des listes pour stocker les input_ids et les prénoms
     input_ids_list = []
     prenoms_list = []
+    labels=df_w.labels.values
 
 # Trouver la longueur maximale des input_ids
     max_length = 0
@@ -179,10 +184,10 @@ def bert_preprocessing(df_w):
     padded_input_ids_list = [torch.cat([input_ids, torch.zeros(max_length - len(input_ids), dtype=torch.long)]) for input_ids in input_ids_list]
 
 # Créez un DataFrame à partir des listes
-    Final_input = pd.DataFrame({'Phrase': tes_Str_input, 'prenom': prenoms_list, 'input_ids': padded_input_ids_list})
+    Final_input = pd.DataFrame({'Phrase': tes_Str_input, 'prenom': prenoms_list, 'input_ids': padded_input_ids_list,"labels":labels})
 
 # Affichez le DataFrame
-    return Final_input.head(3)
+    return Final_input
 
 def preprocess_data():
     FN_df,Trs_df=make_dataset3.get_data()
@@ -217,11 +222,19 @@ def preprocess_data():
     texte_liste=df_w.Input_text.values
     texte_liste=list(texte_liste)
     Final_input=bert_preprocessing(df_w)
+    #ajout du colonne des inputs
+    Final_input["labels"]=df_w['labels'].values
+    Final_input=Final_input.drop(["Phrase"],axis=1)
+    Final_input=Final_input.set_index("prenom")
+    Train_data,Test_data=train_test_split(Final_input,test_size=0.2)
+    X_train,Y_train=Train_data.input_ids,Train_data.labels
+    X_test,Y_test=Test_data.input_ids,Test_data.labels
+    print( " Train :", X_train.shape,Y_train.shape)
+    print( " Test :", X_test.shape,Y_test.shape)
     Final_input.to_csv(project_root+"/data/df_after_tokenizeation.csv")
     print("well done")
-    return  Final_input
+    return  (X_train,Y_train),(X_test,Y_test)
 
-import yaml
 config_path=project_root+"/config.yaml"
 with open(config_path, 'r') as f:
     config = yaml.safe_load(f)
