@@ -4,8 +4,10 @@ __pycache__/
 
 # C extensions
 *.so
-# fichier de configurations
+# fichier de configurations qui contiennent des informations sensiblee
 *.yaml
+# les les modéles et leurs configuations (la valeur de chaque couche dense)
+*.pth
 
 # Distribution / packaging
 .Python
